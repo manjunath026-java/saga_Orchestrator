@@ -14,18 +14,14 @@ public class PaymentConsumer {
     public void consumePayment(PaymentRequest paymentRequest) {
         log.info("Received payment request for Order ID: {}", paymentRequest.getOrderId());
 
-        // Simulate payment processing
         if (paymentRequest.getAmount() != null && paymentRequest.getAmount() > 0) {
             log.info("Processing payment of ₹{} for User ID: {}", paymentRequest.getAmount(), paymentRequest.getUserId());
 
-            // Simulate success/failure logic
             boolean success = true; // Replace with real logic
             if (success) {
                 log.info("Payment successful for Order ID: {}", paymentRequest.getOrderId());
-                // Optionally produce an event to `payment-success-topic`
             } else {
                 log.warn("Payment failed for Order ID: {}", paymentRequest.getOrderId());
-                // Optionally produce an event to `payment-failure-topic`
             }
 
         } else {

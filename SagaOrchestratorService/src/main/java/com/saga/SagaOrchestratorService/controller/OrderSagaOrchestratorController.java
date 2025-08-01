@@ -38,7 +38,6 @@ public class OrderSagaOrchestratorController {
     @PostMapping("/createorder")
     public ResponseEntity<String> placeOrder(@RequestBody OrderRequest request) {
         try {
-            //  Create Order
             ResponseEntity<OrderResponse> orderResponse = restTemplate.postForEntity(
                     orderServiceUrl + "/create", request, OrderResponse.class
             );
@@ -91,4 +90,3 @@ public class OrderSagaOrchestratorController {
         }
     }
 }
-

@@ -26,17 +26,35 @@ public class PaymentService {
     @Qualifier("paymentCompletedKafkaTemplate")
     private final KafkaTemplate<String, PaymentCompletedEvent> paymentCompletedKafkaTemplate;
 
-    public void processPayment(PaymentRequest request) {
-        Payment payment = new Payment();
-        payment.setAmount(request.getAmount());
-        payment.setStatus("SUCCESS");
-        payment.setUserId(request.getUserId());
-        paymentRepository.save(payment);
+//    public void processPayment(PaymentRequest request) {
+//        Payment payment = new Payment();
+//        payment.setAmount(request.getAmount());
+//        payment.setStatus("SUCCESS");
+//        payment.setUserId(request.getUserId());
+//        paymentRepository.save(payment);
+//
+//        UserBalanceUpdateEvent event = new UserBalanceUpdateEvent(request.getUserId(), request.getAmount());
+//        balanceUpdateKafkaTemplate.send("user-balance-update-topic", event);
+//        log.info("Sent balance update event: {}", event);
+//    }
+public void processPayment(PaymentRequest request) {
+    Payment payment = new Payment();
+    payment.setAmount(request.getAmount());
+    payment.setStatus("SUCCESS");
+    payment.setUserId(request.getUserId());
+    payment.setOrderId(request.getOrderId());
+    paymentRepository.save(payment);
 
-        UserBalanceUpdateEvent event = new UserBalanceUpdateEvent(request.getUserId(), request.getAmount());
-        balanceUpdateKafkaTemplate.send("user-balance-update-topic", event);
-        log.info("Sent balance update event: {}", event);
-    }
+    UserBalanceUpdateEvent event = new UserBalanceUpdateEvent(request.getUserId(), request.getAmount());
+    balanceUpdateKafkaTemplate.send("user-balance-update-topic", event);
+    log.info("Sent balance update event after payment: {}", event);
+
+    paymentCompletedKafkaTemplate.send(
+            "payment-completed-topic",
+            new PaymentCompletedEvent(request.getUserId(), request.getAmount(), "SUCCESS")
+    );
+}
+
 
     public void makePayment(Long userId, Double amount) {
         Payment payment = Payment.builder()
